@@ -1,4 +1,18 @@
-local function on_completion_result(context, err, _, result)
+local function dump(o)
+   if type(o) == 'table' then
+      local s = '{ '
+      for k,v in pairs(o) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. dump(v) .. ','
+      end
+      return s .. '} '
+   else
+      return tostring(o)
+   end
+end
+
+
+local function on_completion_result(context, state, err, result)
     if err or not result then
         return
     end
@@ -12,8 +26,8 @@ local function on_complete_lsp(context)
         context.bufnr,
         'textDocument/completion',
         vim.lsp.util.make_position_params(),
-        function(err, _, result)
-            on_completion_result(context, err, _, result)
+        function(err, result, ctx)
+            on_completion_result(context, state, err, result)
         end
     )
 end
